@@ -1,0 +1,6 @@
+.DS_Store
+guardium-combine-functionalities/node_modules
+guardium-combine-functionalities/package-lock.json
+
+guardium-report-summarization/credentials.json
+guardium-report-summarization/token.json

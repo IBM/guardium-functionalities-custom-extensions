@@ -1,0 +1,199 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Guardium Report API",
+    "description": "API to retrieve the Guardium Vulnerability Assessment Result Summary Report.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://guardiumreportsummary.1jg3qln4527f.us-east.codeengine.appdomain.cloud",
+      "description": "Production server",
+      "variables": {
+        "hostname": {
+          "default": "api.example.com"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Get Guardium Vulnerability Assessment Result Summary Report",
+        "description": "Retrieve the Guardium Vulnerability Assessment Result Summary Report for a specified date range.",
+        "parameters": [
+          {
+            "name": "reportName",
+            "in": "query",
+            "required": true,
+            "description": "Name of the report to retrieve.",
+            "schema": {
+              "type": "string",
+              "example": "Guardium Vulnerability Assessment Result Summary Report"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date for the report data in YYYY-MM-DD format.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2024-08-01"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date for the report data in YYYY-MM-DD format.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2024-08-22"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "description": "Username for authentication.",
+            "schema": {
+              "type": "string",
+              "example": "username123"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "description": "Password for authentication.",
+            "schema": {
+              "type": "string",
+              "format": "password",
+              "example": "password123"
+            }
+          },
+          {
+            "name": "userEmail",
+            "in": "query",
+            "required": true,
+            "description": "Email address of the user requesting the report.",
+            "schema": {
+              "type": "string",
+              "format": "email",
+              "example": "user@example.com"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of the report.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    },
+                    "data": {
+                      "type": "string",
+                      "example": "Report content in base64 encoded format."
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The report was generated successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid date format or missing required parameters."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Authentication failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Authentication failed. Please check your username and password."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Report not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "The specified report could not be found."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "An error occurred while generating the report. Please try again later."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

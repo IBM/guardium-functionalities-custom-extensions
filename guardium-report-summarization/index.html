@@ -1,0 +1,174 @@
+<!--
+Copyright 2024 IBM All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Note: The code below is a sample provided to illustrate one way
+to approach this issue and is used as is and at your own risk. In order
+for this example to perform as intended, the script must be laid out exactly
+as indicated below. Product Support cannot customize this script for specific
+environments or applications.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example password</title>
+    <style>
+        .password-div {
+            position: relative;
+            width: 100%;
+            height: 100% !important;
+            display: block !important;
+            background: lavenderblush !important;
+            visibility: hidden;
+        }
+
+        .password-input {
+            width: 100% !important;
+            height: 42px !important;
+            box-sizing: border-box !important;
+            background: lavenderblush !important;
+            display: block !important;
+            border: none !important;
+            outline: none !important;
+        }
+    </style>
+    <script>
+
+        function addPasswordListenerWithRetry(retryInterval = 100, maxTimeout = 5000) {
+            const startTime = new Date().getTime();
+
+            const interval = setInterval(() => {
+                const passwordInput = document.querySelector('.password-input');
+                if (passwordInput) {
+                    passwordInput.addEventListener('keydown', function(event) {
+                        if (event.key === 'Enter') { send_password(); }
+                    });
+                    clearInterval(interval);
+                } else {
+                    const currentTime = new Date().getTime();
+                    if (currentTime - startTime > maxTimeout) { clearInterval(interval); }
+                }
+            }, retryInterval);
+        }
+
+        function validate_skill_variables(event) {
+            if (event.data === undefined) {
+                return false;
+            }
+            if (event.data.context.skills["actions skill"].skill_variables === undefined) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function pre_send_handler(event, instance) {
+            if (!validate_skill_variables(event)) {
+                return
+            }
+            if (!event.data.context.skills["actions skill"].skill_variables["is_password"]) {
+                event.data.context.skills["actions skill"].skill_variables["is_password"] = false;
+            }
+        }
+
+        function recieve_handler(event, instance) {
+            if (!validate_skill_variables(event)) {
+                return
+            }
+
+            if (event.data.context.skills["actions skill"].skill_variables["is_password"]) {
+                instance.updateAssistantInputFieldVisibility(false);
+                var p = document.querySelector('.password-div');
+                p.style.visibility = "visible";
+
+                setTimeout(() => {
+                   var i = p.querySelector('.password-input');
+                    i.focus();
+                }, 100);
+            }
+
+        }
+
+        function send_password() {
+            let passwordValue = document.querySelector('.password-input').value;
+
+            document.querySelector('.password-div').style.visibility = "hidden";
+            window.instance.updateAssistantInputFieldVisibility(true);
+            document.querySelector('.password-input').value = "";
+
+            let message = {
+                input: {
+                    message_type: 'text',
+                    text: passwordValue
+                },
+                context: {
+                    skills: {
+                        ['actions skill']: {
+                        skill_variables: {
+                          is_password: false
+                        }
+                      }
+                    }
+                  }
+            }
+            let options = {
+                silent: true
+            }
+            window.instance.send(message, options);
+        }
+
+        window.watsonAssistantChatOptions = {
+
+            // CHANGE THESE TO YOUR WEB CHAT VALUES
+            integrationID: "Update_INTEGRATION_ID", // The ID of this integration.
+            region: "Update_REGION", // The region your integration is hosted in.
+            serviceInstanceID: "Update_SERVICE_INSTANCE_ID", // The ID of your service instance.
+
+            // Optional piece for demo.
+            openChatByDefault: true,
+            headerConfig: {
+                showRestartButton: true,
+                minimizeButtonIconType: 'minimize'
+            },
+            /////////////////
+
+            onLoad: async (localinstance) => {
+                window.instance = localinstance;
+                instance.on({type: 'receive', handler: recieve_handler});
+                instance.on({type: 'pre:send', handler: pre_send_handler});
+                await instance.render();
+
+                instance.writeableElements.beforeInputElement.innerHTML = `
+                <div class="WACInputContainer password-div" style="visibility: hidden">
+                    <input type="password" class="password-input" placeholder="Enter your password..."/>
+                </div>`
+                setTimeout(() => {
+                   addPasswordListenerWithRetry();
+                }, 100);
+
+
+            }
+        };
+        setTimeout(function () {
+            const t = document.createElement('script');
+            t.src = "https://web-chat.global.assistant.watson.appdomain.cloud/versions/" + (window.watsonAssistantChatOptions.clientVersion || 'latest') + "/WatsonAssistantChatEntry.js";
+            document.head.appendChild(t);
+        });
+    </script>
+</head>
+<body  background="https://www.northdoor.co.uk/wp-content/uploads/2018/09/IBM_Security-Guardium-Analyzer_shutterstock_1463056847.jpg">
+
+</body>
+</html>

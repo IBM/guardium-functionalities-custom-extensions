@@ -1,0 +1,9 @@
+{
+  "name": "token-fetcher",
+  "version": "1.0.0",
+  "description": "A Node.js app to fetch tokens using client credentials",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.24.0"
+  }
+}
